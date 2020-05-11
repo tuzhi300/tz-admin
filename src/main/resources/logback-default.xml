@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <!-- logger 默认等级  -->
+    <property name="log.level.trace" value="TRACE"></property>
+    <property name="log.level.info" value="INFO"></property>
+    <property name="log.level.debug" value="DEBUG"></property>
+    <property name="log.level.warn" value="WARN"></property>
+    <property name="log.level.error" value="ERROR"></property>
+    <!--单个文件大小-->
+    <property name="log.file.max.size" value="10MB"></property>
+    <!--保存时长（天）-->
+    <property name="log.file.max.history.root" value="90"></property>
+    <property name="log.file.max.history.project" value="15"></property>
+    <!--字符集-->
+    <property name="log.file.charset" value="UTF-8"></property>
+    <!-- 日志样式 -->
+    <property name="layout_1"
+              value="{'date':'%date{yyyy-MM-dd HH:mm:ss}','level':'%-5level','postion':'%logger:%line','msg':'%m' }%n"/>
+    <property name="layout_2"
+              value="[%date{yyyy-MM-dd HH:mm:ss}] [%thread] [%-5level] [%logger:%line] --%mdc{client} %msg%n"/>
+
+    <!--    控制台输出-->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${def_layout}</pattern>
+            <charset>${log.file.charset}</charset>
+        </encoder>
+<!--        <filter class="net.kuper.tz.console.config.LogFilter"></filter>-->
+    </appender>
+
+    <!--    记录系统异常和警告-->
+    <appender name="ROOT_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${log.home}/${log.project.name}-warn-error-%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <maxHistory>${log.file.max.history.root}</maxHistory>
+            <maxFileSize>${log.file.max.size}</maxFileSize>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${def_layout}</pattern>
+            <charset>${log.file.charset}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!--忽略小于当前配置级别的日志-->
+            <level>${log.level.warn}</level>
+        </filter>
+    </appender>
+
+
+    <!--    记录项目中需要跟踪的日志，便于日常问题查找-->
+    <!-- project logger -->
+    <appender name="PROJECT_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${log.home}/${log.project.name}-%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <maxHistory>${log.file.max.history.project}</maxHistory>
+            <maxFileSize>${log.file.max.size}</maxFileSize>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${def_layout}</pattern>
+            <charset>${log.file.charset}</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${log.project.level}</level>
+        </filter>
+    </appender>
+
+    <!-- 下面配置一些第三方包的日志过滤级别，用于避免刷屏 -->
+    <logger name="org.springframework" level="${log.root.level}"/>
+    <logger name="org.hibernate" level="${log.root.level}"/>
+    <logger name="org.quartz" level="${log.root.level}"/>
+    <logger name="org.apache.http" level="${log.root.level}"/>
+    <logger name="org.apache.commons" level="${log.root.level}"/>
+    <logger name="org.apache.velocity" level="${log.root.level}"/>
+    <logger name="org.apache.shiro" level="${log.root.level}"/>
+    <logger name="freemarker" level="${log.root.level}"/>
+    <logger name="io.netty" level="${log.root.level}"/>
+    <logger name="org.jooby" level="${log.root.level}"/>
+    <logger name="org.apache.tomcat" level="${log.root.level}"/>
+    <logger name="org.apache.catalina" level="${log.root.level}"/>
+    <logger name="sun.rmi" level="${log.root.level}"/>
+    <logger name="javax.management" level="${log.root.level}"/>
+    <logger name="org.mybatis.spring" level="${log.root.level}"/>
+    <logger name="reactor" level="${log.root.level}"/>
+    <logger name="springfox" level="${log.root.level}"/>
+    <logger name="org.aspectj" level="${log.root.level}"/>
+    <logger name="org.apache.coyote" level="${log.root.level}"/>
+    <logger name="java.sql.Connection" level="${log.root.level}"/>
+    <logger name="java.sql.Statement" level="${log.root.level}"/>
+    <logger name="java.sql.PreparedStatement" level="${log.root.level}"/>
+    <logger name="com.alibaba.druid" level="${log.root.level}"/>
+
+    <root level="${log.root.level}">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ROOT_LOG"/>
+    </root>
+
+</included>

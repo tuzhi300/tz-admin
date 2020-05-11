@@ -1,0 +1,168 @@
+tz:
+  build:
+    version: @project.version@
+    time: @timestamp@
+  admin:
+    super-role-id: init0000000000000000000000000001 #超级角色Id
+    system-user-id: init0000000000000000000000000000 #系统用户ID（自动处理）
+  transport:
+    req-attribute-user-id-key: _user_id_
+    req-header-token-key: X-Token #用户参数
+    req-header-sign-key: X-Sign #参数签名
+    req-header-platform-key: X-Platform #客户端平台
+    req-header-version-key: X-Version #客户端版本
+    res-header-sign-key: X-Sign #响应参数签名
+  storage: #云存储
+    config-parent-key: cloud_storage #上级字典key
+  bmap:
+    ak: 32yg9dFp2LFgeppXYH6INK6Op62ina0H
+
+
+# Tomcat
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 1000
+    min-spare-threads: 30
+  servlet:
+    context-path: /
+    session:
+      timeout: 20M
+      tracking-modes: cookie
+      cookie:
+        http-only: true
+  compression:
+    enabled: true
+logging:
+  config: classpath:logback-@profiles.active@.xml
+  level:
+    web:
+
+mybatis:
+  mapper-locations: classpath*:/mapper/*/*.xml
+
+spring:
+  profiles:
+    active: @profiles.active@
+  # jackson时间格式化
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+      enabled: true
+  freemarker:
+    check-template-location: false
+  quartz:
+    jdbc:
+      initialize-schema: never #配置是否每次重启项目都自动生成Quartz表结构,在此使用always生成一次后就可以改为never配置
+    job-store-type: jdbc
+    startup-delay: 60
+    scheduler-name: TZ
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: TZ
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_  #Quartz表前缀
+            isClustered: true
+            clusterCheckinInterval: 10000
+            useProperties: false
+            maxMisfiresToHandleAtATime: 1
+            misfireThreshold: 1200
+            selectWithLockSQL: SELECT * FROM {0}LOCKS UPDLOCK WHERE LOCK_NAME = ?
+#            driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate # PostgreSQL数据库
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            #线程数 一个任务使用一个线程
+            threadCount: 20
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+  mvc:
+    throw-exception-if-no-handler-found: true
+    static-path-pattern: /static/**
+    servlet:
+      path: /
+    view:
+      prefix: /static
+      suffix: .html
+  resources:
+    static-locations: file:${tz.html-source},classpath:/static/,classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
+    add-mappings: true
+    cache:
+      period: 3600 #页面浏览器的配置缓存多少秒
+      cachecontrol:
+        cache-public: true
+    chain:
+      compressed: true
+      enabled: true
+      cache: true
+      html-application-cache: true
+  datasource:
+    name: druidDataSource
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      initial-size: 10
+      max-active: 100
+      min-idle: 10
+      max-wait: 60000
+      pool-prepared-statements: true
+      max-open-prepared-statements: 50
+      max-pool-prepared-statement-per-connection-size: 20
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      use-global-data-source-stat: true
+      connection-properties: druid.stat.mergeSql=true;druid.stat.logSlowSql=true;druid.stat.slowSqlMillis=3000
+      connection-init-sqls: SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 3000
+          merge-sql: true
+          enabled: true
+        wall:
+          config:
+            multi-statement-allow: true
+            start-transaction-allow: true
+          enabled: true
+        slf4j:
+          enabled: true
+          data-source-log-enabled: true
+          statement-create-after-log-enabled: false
+          statement-close-after-log-enabled: false
+          result-set-open-after-log-enabled: false
+          result-set-close-after-log-enabled: false
+      # Druid 监控过滤相关配置参数
+      web-stat-filter:
+        session-stat-enable: true
+        principal-session-name: login_user_key
+        session-stat-max-count: 2000
+        profile-enable: true
+        exclusions: '*.js,*.gif,*.jpg,*.jpeg,*.png,*.css,*.ico,*.jsp,*.woff,*.woff2,*.eot,*.svg,*.ttf,/swagger*,/webjars/*,/v2/api-docs,/doc.html,/druid,/druid/*'
+      stat-view-servlet:
+        #        login-username: admin
+        #        login-password: admin
+        enabled: true
+        reset-enable: false
+        url-pattern: /druid/*
+        allow:
+        deny:
+  redis:
+    jedis:
+      pool:
+        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: 100ms      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 10      # 连接池中的最大空闲连接
+        min-idle: 5       # 连接池中的最小空闲连接
+

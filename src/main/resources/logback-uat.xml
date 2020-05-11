@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!-- 上下文名称 -->
+    <contextName>tz-uat</contextName>
+    <!-- 定义log 文件的 home 目录  -->
+    <property name="log.home" value="logs"></property>
+    <!-- 目录 -->
+    <property name="log.project.name" value="jsb"></property>
+    <!-- 全局-过滤等级  -->
+    <property name="log.root.level" value="WARN"></property>
+    <!-- 项目-过滤等级  -->
+    <property name="log.project.level" value="DEBUG"></property>
+    <!-- 默认日志样式 -->
+    <property name="def_layout" value="[%date{yyyy-MM-dd HH:mm:ss}] [%thread] [%-5level] [%logger:%line] --%mdc{client} %msg%n"></property>
+
+    <include resource="logback-default.xml"></include>
+
+    <!--项目中打印日志，单独一个文件-->
+    <logger name="net.kuper.tz" level="${log.project.level}">
+        <appender-ref ref="PROJECT_LOG"/>
+    </logger>
+</configuration>
